@@ -205,9 +205,13 @@ export default function DetailModal() {
                           {(detail.mediaDetail?.release_date || detail.mediaDetail?.first_air_date || "").substring(0, 4)}
                         </Typography>
                         <AgeLimitChip label={`${getRandomNumber(20)}+`} />
-                        <Typography variant="subtitle2">{`${formatMinuteToReadable(
-                          getRandomNumber(180)
-                        )}`}</Typography>
+                        <Typography variant="subtitle2">
+                          {detail.mediaDetail?.runtime
+                            ? formatMinuteToReadable(detail.mediaDetail.runtime)
+                            : detail.mediaDetail?.episode_run_time?.[0]
+                            ? formatMinuteToReadable(detail.mediaDetail.episode_run_time[0])
+                            : ""}
+                        </Typography>
                         <QualityChip label="HD" />
                       </Stack>
 

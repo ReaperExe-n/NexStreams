@@ -36,17 +36,6 @@ export default function SimilarVideoCard({ video }: SimilarVideoCardProps) {
         />
         <div
           style={{
-            top: 10,
-            right: 15,
-            position: "absolute",
-          }}
-        >
-          <Typography variant="subtitle2">{`${formatMinuteToReadable(
-            getRandomNumber(180)
-          )}`}</Typography>
-        </div>
-        <div
-          style={{
             left: 0,
             right: 0,
             bottom: 0,

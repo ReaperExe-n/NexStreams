@@ -55,7 +55,7 @@ export default function withPagination(
 
     if (pageState) {
       return (
-        <Component genre={genre} data={pageState} handleNext={handleNext} />
+        <Component genre={genre} data={pageState} handleNext={handleNext} mediaType={mediaType} />
       );
     }
     return <MainLoadingScreen />;

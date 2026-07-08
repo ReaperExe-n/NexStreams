@@ -194,9 +194,13 @@ export default function VideoCardModal({
               sx={{ color: "success.main", fontWeight: 700 }}
             >{`${getRandomNumber(100)}% Match`}</Typography>
             <AgeLimitChip label={`${getRandomNumber(20)}+`} />
-            <Typography variant="body2">{`${formatMinuteToReadable(
-              getRandomNumber(180)
-            )}`}</Typography>
+            <Typography variant="body2">
+              {movieDetail?.runtime
+                ? formatMinuteToReadable(movieDetail.runtime)
+                : movieDetail?.episode_run_time?.[0]
+                ? formatMinuteToReadable(movieDetail.episode_run_time[0])
+                : ""}
+            </Typography>
             <QualityChip label="HD" />
           </Stack>
           {genres && (

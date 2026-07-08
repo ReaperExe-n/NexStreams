@@ -66,8 +66,9 @@ interface SlickSliderProps {
   data: PaginatedMovieResult;
   genre: Genre | CustomGenre;
   handleNext: (page: number) => void;
+  mediaType?: MEDIA_TYPE;
 }
-export default function SlickSlider({ data, genre }: SlickSliderProps) {
+export default function SlickSlider({ data, genre, mediaType }: SlickSliderProps) {
   const sliderRef = useRef<Slider>(null);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [showExplore, setShowExplore] = useState(false);
@@ -217,7 +218,7 @@ export default function SlickSlider({ data, genre }: SlickSliderProps) {
                 {data.results
                   .filter((i) => !!i.backdrop_path && !reportedVideos.includes(i.id))
                   .map((item) => (
-                    <SlideItem key={item.id} item={item} />
+                    <SlideItem key={item.id} item={{...item, media_type: item.media_type || mediaType}} />
                   ))}
               </StyledSlider>
             </CustomNavigation>
