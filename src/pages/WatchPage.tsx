@@ -11,10 +11,10 @@ import { MEDIA_TYPE } from "src/types/Common";
 import DramaPlayer from "src/components/DramaPlayer";
 import TvPlayerUI from "src/components/TvPlayerUI";
 
-type ServerKey = "vidlink" | "cine" | "embed" | "dramacool";
+type ServerKey = string;
 
 interface ServerOption {
-  key: ServerKey;
+  key: string;
   name: string;
   badge: string;
   getUrl?: (id: string, mediaType: string, season?: number, episode?: number) => string;
@@ -40,9 +40,45 @@ const BASE_SERVERS: ServerOption[] = [
         : `https://cine.su/embed/movie/${id}`,
   },
   {
-    key: "embed",
-    name: "Embed.su (Backup 2)",
+    key: "vidsrc",
+    name: "VidSrc.me (Backup 2)",
+    badge: "Reliable",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&ep=${episode}`
+        : `https://vidsrc.me/embed/movie?tmdb=${id}`,
+  },
+  {
+    key: "vidsrc_pro",
+    name: "VidSrc.pro (Backup 3)",
+    badge: "Fast",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://vidsrc.pro/embed/tv/${id}/${season}/${episode}`
+        : `https://vidsrc.pro/embed/movie/${id}`,
+  },
+  {
+    key: "superembed",
+    name: "SuperEmbed (Backup 4)",
     badge: "Multi-Server",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
+        : `https://multiembed.mov/?video_id=${id}&tmdb=1`,
+  },
+  {
+    key: "2embed",
+    name: "2Embed (Backup 5)",
+    badge: "Stable",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`
+        : `https://www.2embed.cc/embed/${id}`,
+  },
+  {
+    key: "embedsu",
+    name: "Embed.su (Backup 6)",
+    badge: "Fallback",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
         ? `https://embed.su/embed/tv/${id}/${season}/${episode}`
@@ -96,6 +132,12 @@ export function Component() {
 
   const handleGoBack = () => {
     navigate("/browse");
+  };
+
+  const handleFixLag = () => {
+    const currentIndex = servers.findIndex((s) => s.key === activeServer);
+    const nextIndex = (currentIndex + 1) % servers.length;
+    setActiveServer(servers[nextIndex].key);
   };
 
   const handleReportVideo = () => {
@@ -230,59 +272,32 @@ export function Component() {
           </Button>
         </Stack>
 
-        {/* Server Selectors */}
+        {/* Fix Lag Button */}
         {servers.length > 1 && (
-          <Stack
-            direction="row"
-            spacing={1.5}
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<DnsIcon />}
+            onClick={handleFixLag}
             sx={{
-            pointerEvents: "auto", // Re-enable clicks for server selection buttons
-            bgcolor: "rgba(18, 18, 18, 0.8)",
-            p: 0.75,
-            borderRadius: "30px",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            boxShadow: "0px 8px 32px rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(12px)",
-          }}
-        >
-          {servers.map((server) => {
-            const isActive = server.key === activeServer;
-            return (
-              <Button
-                key={server.key}
-                variant={isActive ? "contained" : "text"}
-                color={isActive ? "error" : "inherit"}
-                onClick={() => setActiveServer(server.key)}
-                size="small"
-                startIcon={<DnsIcon />}
-                sx={{
-                  borderRadius: "20px",
-                  textTransform: "none",
-                  fontWeight: isActive ? "bold" : "normal",
-                  px: 2.5,
-                  py: 0.75,
-                  fontSize: "0.85rem",
-                  color: isActive ? "white" : "rgba(255, 255, 255, 0.75)",
-                  "&:hover": {
-                    bgcolor: isActive ? "error.main" : "rgba(255, 255, 255, 0.08)",
-                  },
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <Stack spacing={-0.25} alignItems="flex-start" sx={{ textAlign: "left" }}>
-                  <Typography variant="body2" sx={{ fontWeight: isActive ? 700 : 500, fontSize: "0.85rem" }}>
-                    {server.name}
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontSize: "0.65rem", opacity: isActive ? 0.95 : 0.6, color: "inherit" }}>
-                    {server.badge}
-                  </Typography>
-                </Stack>
-              </Button>
-            );
-          })}
-        </Stack>
+              pointerEvents: "auto",
+              borderRadius: "30px",
+              textTransform: "none",
+              fontWeight: "bold",
+              px: 3,
+              height: 48,
+              bgcolor: "rgba(229, 9, 20, 0.9)",
+              "&:hover": {
+                bgcolor: "rgba(229, 9, 20, 1)",
+                transform: "scale(1.05)",
+              },
+              transition: "all 0.2s ease-in-out",
+            }}
+          >
+            Fix Lag / Change Server
+          </Button>
         )}
-      </Box>
+        </Box>
 
       {/* Movie/TV Stream Iframe, TvPlayerUI, or DramaPlayer */}
       {activeServer === "dramacool" ? (
