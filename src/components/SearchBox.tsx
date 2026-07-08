@@ -23,15 +23,17 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
-  "& .NetflixInputBase-input": {
+  "& .MuiInputBase-input": {
     width: 0,
-    transition: theme.transitions.create("width", {
+    opacity: 0,
+    transition: theme.transitions.create(["width", "opacity"], {
       duration: theme.transitions.duration.complex,
       easing: theme.transitions.easing.easeIn,
     }),
-    "&:focus": {
-      width: "auto",
-    },
+  },
+  "&.expanded .MuiInputBase-input": {
+    width: "200px",
+    opacity: 1,
   },
 }));
 
@@ -52,9 +54,8 @@ export default function SearchBox() {
   }, [query]);
 
   const handleClickSearchIcon = () => {
-    if (!isFocused) {
-      searchInputRef.current?.focus();
-    }
+    searchInputRef.current?.focus();
+    setIsFocused(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +78,7 @@ export default function SearchBox() {
         <SearchIcon />
       </SearchIconWrapper>
       <StyledInputBase
+        className={isFocused || inputValue ? "expanded" : ""}
         inputRef={searchInputRef}
         placeholder="Titles, people, genres"
         value={inputValue}
