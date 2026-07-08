@@ -21,7 +21,7 @@ export default function DramaPlayer({ title }: DramaPlayerProps) {
       try {
         setLoading(true);
         // 1. Search for drama
-        const searchRes = await axios.get(`http://localhost:3001/movies/dramacool/search/${encodeURIComponent(title)}`);
+        const searchRes = await axios.get(`/api/movies/dramacool/search/${encodeURIComponent(title)}`);
         if (searchRes.data.results.length === 0) {
           setError("Drama not found on Dramacool");
           setLoading(false);
@@ -30,7 +30,7 @@ export default function DramaPlayer({ title }: DramaPlayerProps) {
         const dramaId = searchRes.data.results[0].id;
         
         // 2. Fetch info
-        const infoRes = await axios.get(`http://localhost:3001/movies/dramacool/info?id=${encodeURIComponent(dramaId)}`);
+        const infoRes = await axios.get(`/api/movies/dramacool/info?id=${encodeURIComponent(dramaId)}`);
         if (infoRes.data.episodes.length === 0) {
           setError("No episodes found");
           setLoading(false);
@@ -53,7 +53,7 @@ export default function DramaPlayer({ title }: DramaPlayerProps) {
     try {
       setActiveEpisode(episodeId);
       setLoading(true);
-      const watchRes = await axios.get(`http://localhost:3001/movies/dramacool/watch?episodeId=${encodeURIComponent(episodeId)}`);
+      const watchRes = await axios.get(`/api/movies/dramacool/watch?episodeId=${encodeURIComponent(episodeId)}`);
       if (watchRes.data.iframe) {
         setCurrentIframe(watchRes.data.iframe);
       } else {
