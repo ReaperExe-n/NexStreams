@@ -24,7 +24,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     genre = genres?.find((t) => t.id.toString() === (params.genreId as string));
   }
 
-  return genre;
+  return genre || null;
 }
 
 export function Component() {

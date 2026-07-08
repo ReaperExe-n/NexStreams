@@ -27,6 +27,7 @@ import { useDetailModal } from "src/providers/DetailModalProvider";
 import { useGetSimilarVideosQuery } from "src/store/slices/discover";
 import { MEDIA_TYPE } from "src/types/Common";
 import VideoJSPlayer from "./watch/VideoJSPlayer";
+import EpisodesSection from "./EpisodesSection";
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -164,7 +165,7 @@ export default function DetailModal() {
                 }}
               >
                 <MaxLineTypography variant="h4" maxLine={1} sx={{ mb: 2 }}>
-                  {detail.mediaDetail?.title}
+                  {detail.mediaDetail?.title || detail.mediaDetail?.name}
                 </MaxLineTypography>
                 <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
                   <PlayButton
@@ -201,7 +202,7 @@ export default function DetailModal() {
                           sx={{ color: "success.main" }}
                         >{`${getRandomNumber(100)}% Match`}</Typography>
                         <Typography variant="body2">
-                          {detail.mediaDetail?.release_date.substring(0, 4)}
+                          {(detail.mediaDetail?.release_date || detail.mediaDetail?.first_air_date || "").substring(0, 4)}
                         </Typography>
                         <AgeLimitChip label={`${getRandomNumber(20)}+`} />
                         <Typography variant="subtitle2">{`${formatMinuteToReadable(
@@ -234,6 +235,14 @@ export default function DetailModal() {
                 </Container>
               </Box>
             </Box>
+
+            {detail.mediaType === MEDIA_TYPE.Tv && detail.mediaDetail?.seasons && (
+              <EpisodesSection 
+                showId={detail.mediaDetail.id} 
+                seasons={detail.mediaDetail.seasons} 
+              />
+            )}
+
             {similarVideos && similarVideos.results.length > 0 && (
               <Container
                 sx={{

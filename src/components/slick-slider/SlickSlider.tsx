@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { styled, Theme, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
 import CustomNavigation from "./CustomNavigation";
 import VideoItemWithHover from "src/components/VideoItemWithHover";
@@ -154,35 +155,47 @@ export default function SlickSlider({ data, genre }: SlickSliderProps) {
             alignItems="center"
             sx={{ mb: 2, pl: { xs: "30px", sm: "60px" } }}
           >
-            <NetflixNavigationLink
-              variant="h5"
-              to={`/genre/${
-                genre.id || genre.name.toLowerCase().replace(" ", "_")
-              }`}
-              sx={{
-                display: "inline-block",
-                fontWeight: 700,
-              }}
-              onMouseOver={() => {
-                setShowExplore(true);
-              }}
-              onMouseLeave={() => {
-                setShowExplore(false);
-              }}
-            >
-              {`${genre.name} Movies `}
-              <MotionContainer
-                open={showExplore}
-                initial="initial"
-                sx={{ display: "inline", color: "success.main" }}
+            {genre.apiString === "popular_dramas" ? (
+              <Typography
+                variant="h5"
+                sx={{
+                  display: "inline-block",
+                  fontWeight: 700,
+                }}
               >
-                {"Explore All".split("").map((letter, index) => (
-                  <motion.span key={index} variants={varFadeIn}>
-                    {letter}
-                  </motion.span>
-                ))}
-              </MotionContainer>
-            </NetflixNavigationLink>
+                {genre.name}
+              </Typography>
+            ) : (
+              <NetflixNavigationLink
+                variant="h5"
+                to={`/genre/${
+                  genre.id || genre.name.toLowerCase().replace(" ", "_")
+                }`}
+                sx={{
+                  display: "inline-block",
+                  fontWeight: 700,
+                }}
+                onMouseOver={() => {
+                  setShowExplore(true);
+                }}
+                onMouseLeave={() => {
+                  setShowExplore(false);
+                }}
+              >
+                {`${genre.name} Movies `}
+                <MotionContainer
+                  open={showExplore}
+                  initial="initial"
+                  sx={{ display: "inline", color: "success.main" }}
+                >
+                  {"Explore All".split("").map((letter, index) => (
+                    <motion.span key={index} variants={varFadeIn}>
+                      {letter}
+                    </motion.span>
+                  ))}
+                </MotionContainer>
+              </NetflixNavigationLink>
+            )}
           </Stack>
 
           <RootStyle>

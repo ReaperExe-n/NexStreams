@@ -1,45 +1,51 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Box, IconButton, Button, Stack, Typography } from "@mui/material";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import DnsIcon from "@mui/icons-material/Dns";
 import FlagIcon from "@mui/icons-material/Flag";
+import { useGetAppendedVideosQuery } from "src/store/slices/discover";
+import { useDispatch } from "react-redux";
+import { updateProgress } from "src/store/slices/watchProgressSlice";
+import { MEDIA_TYPE } from "src/types/Common";
+import DramaPlayer from "src/components/DramaPlayer";
+import TvPlayerUI from "src/components/TvPlayerUI";
 
-type ServerKey = "vidlink" | "cine" | "embed";
+type ServerKey = "vidlink" | "cine" | "embed" | "dramacool";
 
 interface ServerOption {
   key: ServerKey;
   name: string;
   badge: string;
-  getUrl: (id: string, mediaType: string) => string;
+  getUrl?: (id: string, mediaType: string, season?: number, episode?: number) => string;
 }
 
-const SERVERS: ServerOption[] = [
+const BASE_SERVERS: ServerOption[] = [
   {
     key: "vidlink",
     name: "VidLink (Primary)",
     badge: "Auto-Resume & Subs",
-    getUrl: (id, mediaType) =>
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://vidlink.pro/tv/${id}/1/1`
+        ? `https://vidlink.pro/tv/${id}/${season}/${episode}`
         : `https://vidlink.pro/movie/${id}`,
   },
   {
     key: "cine",
     name: "Cine.su (Backup 1)",
     badge: "High-Speed",
-    getUrl: (id, mediaType) =>
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://cine.su/embed/tv/${id}/1/1`
+        ? `https://cine.su/embed/tv/${id}/${season}/${episode}`
         : `https://cine.su/embed/movie/${id}`,
   },
   {
     key: "embed",
     name: "Embed.su (Backup 2)",
     badge: "Multi-Server",
-    getUrl: (id, mediaType) =>
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://embed.su/embed/tv/${id}/1/1`
+        ? `https://embed.su/embed/tv/${id}/${season}/${episode}`
         : `https://embed.su/embed/movie/${id}`,
   },
 ];
@@ -50,6 +56,32 @@ export function Component() {
   const id = searchParams.get("id");
   const mediaType = searchParams.get("type") || "movie";
   const [activeServer, setActiveServer] = useState<ServerKey>("vidlink");
+
+  const { data: movieDetail } = useGetAppendedVideosQuery(
+    { mediaType: mediaType as MEDIA_TYPE, id: Number(id) },
+    { skip: !id }
+  );
+
+  const servers = useMemo(() => {
+    const lang = movieDetail?.original_language;
+    if (lang === "ko" || lang === "zh" || lang === "ja" || lang === "th") {
+      return [{
+        key: "dramacool",
+        name: "Dramacool (Native)",
+        badge: "Asian Drama",
+      }] as ServerOption[];
+    }
+    return [...BASE_SERVERS];
+  }, [movieDetail]);
+
+  useEffect(() => {
+    if (movieDetail) {
+      const lang = movieDetail.original_language;
+      if (lang === "ko" || lang === "zh" || lang === "ja" || lang === "th") {
+        setActiveServer("dramacool");
+      }
+    }
+  }, [movieDetail]);
 
   // Track if this movie has been reported as broken
   const [isReported, setIsReported] = useState<boolean>(() => {
@@ -81,12 +113,37 @@ export function Component() {
     }
   };
 
+  const dispatch = useDispatch();
+  
+  // Track time spent on page as a mock for video progress (since we use iframes)
+  useEffect(() => {
+    if (!id || !movieDetail) return;
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 5; // 5 seconds
+      dispatch(updateProgress({
+        videoId: id,
+        progressInSeconds: progress,
+        totalDuration: movieDetail.runtime ? movieDetail.runtime * 60 : 5400, // guess 90 mins if missing
+        mediaType,
+        posterPath: movieDetail.poster_path,
+        backdropPath: movieDetail.backdrop_path,
+        title: movieDetail.title || movieDetail.name,
+        timestamp: Date.now()
+      }));
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [id, movieDetail, mediaType, dispatch]);
+
   if (!id) {
     return null;
   }
 
-  const currentServer = SERVERS.find((s) => s.key === activeServer) || SERVERS[0];
-  const embedUrl = currentServer.getUrl(id, mediaType);
+  const currentServer = servers.find((s) => s.key === activeServer) || servers[0];
+  const embedUrl = currentServer.getUrl ? currentServer.getUrl(id, mediaType) : "";
+  const title = movieDetail?.title || movieDetail?.name || "";
 
   return (
     <Box
@@ -174,10 +231,11 @@ export function Component() {
         </Stack>
 
         {/* Server Selectors */}
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{
+        {servers.length > 1 && (
+          <Stack
+            direction="row"
+            spacing={1.5}
+            sx={{
             pointerEvents: "auto", // Re-enable clicks for server selection buttons
             bgcolor: "rgba(18, 18, 18, 0.8)",
             p: 0.75,
@@ -187,7 +245,7 @@ export function Component() {
             backdropFilter: "blur(12px)",
           }}
         >
-          {SERVERS.map((server) => {
+          {servers.map((server) => {
             const isActive = server.key === activeServer;
             return (
               <Button
@@ -223,20 +281,32 @@ export function Component() {
             );
           })}
         </Stack>
+        )}
       </Box>
 
-      {/* Movie/TV Stream Iframe */}
-      <iframe
-        src={embedUrl}
-        style={{
-          width: "100%",
-          height: "100%",
-          border: "none",
-        }}
-        allowFullScreen
-        allow="autoplay; encrypted-media; picture-in-picture"
-        title="Movie Player"
-      />
+      {/* Movie/TV Stream Iframe, TvPlayerUI, or DramaPlayer */}
+      {activeServer === "dramacool" ? (
+        <DramaPlayer title={title} />
+      ) : mediaType === "tv" && movieDetail?.seasons ? (
+        <TvPlayerUI 
+          showId={Number(id)}
+          seasons={movieDetail.seasons}
+          getServerUrl={(showId, mType, season, episode) => 
+            currentServer.getUrl ? currentServer.getUrl(showId, mType, season, episode) : ""
+          }
+        />
+      ) : (
+        <iframe
+          src={embedUrl}
+          width="100%"
+          height="100%"
+          frameBorder="0"
+          allowFullScreen
+          allow="autoplay; encrypted-media"
+          style={{ position: "absolute", top: 0, left: 0 }}
+        />
+      )}
+
     </Box>
   );
 }

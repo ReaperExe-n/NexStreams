@@ -61,7 +61,7 @@ export default function SimilarVideoCard({ video }: SimilarVideoCardProps) {
             sx={{ width: "80%", fontWeight: 700 }}
             variant="subtitle1"
           >
-            {video.title}
+            {video.title || video.name}
           </MaxLineTypography>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function SimilarVideoCard({ video }: SimilarVideoCardProps) {
               <Stack direction="row" spacing={1} alignItems="center">
                 <AgeLimitChip label={`${getRandomNumber(20)}+`} />
                 <Typography variant="body2">
-                  {video.release_date.substring(0, 4)}
+                  {(video.release_date || video.first_air_date || "").substring(0, 4)}
                 </Typography>
               </Stack>
             </div>

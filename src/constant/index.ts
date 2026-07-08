@@ -6,9 +6,14 @@ export const TMDB_V3_API_KEY = import.meta.env.VITE_APP_TMDB_V3_API_KEY;
 export const MAIN_PATH = {
   root: "",
   browse: "browse",
+  movies: "movies",
+  tvShows: "tvshows",
   genreExplore: "genre",
   watch: "watch",
   search: "search",
+  login: "login",
+  profiles: "profiles",
+  myList: "my-list",
 };
 
 export const ARROW_MAX_WIDTH = 60;

@@ -6,9 +6,10 @@ import VideoItemWithHoverPure from "./VideoItemWithHoverPure";
 
 interface VideoItemWithHoverProps {
   video: Movie;
+  progress?: number;
 }
 
-export default function VideoItemWithHover({ video }: VideoItemWithHoverProps) {
+export default function VideoItemWithHover({ video, progress }: VideoItemWithHoverProps) {
   const setPortal = usePortal();
   const elementRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -39,6 +40,7 @@ export default function VideoItemWithHover({ video }: VideoItemWithHoverProps) {
       ref={elementRef}
       handleHover={setIsHovered}
       src={`${configuration?.images.base_url}w300${video.backdrop_path}`}
+      progress={progress}
     />
   );
 }

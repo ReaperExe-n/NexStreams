@@ -17,12 +17,18 @@ import MaxLineTypography from "./MaxLineTypography";
 import AgeLimitChip from "./AgeLimitChip";
 import QualityChip from "./QualityChip";
 import GenreBreadcrumbs from "./GenreBreadcrumbs";
+import CheckIcon from "@mui/icons-material/Check";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { useGetConfigurationQuery } from "src/store/slices/configuration";
 import { useGetAppendedVideosQuery } from "src/store/slices/discover";
 import { MEDIA_TYPE } from "src/types/Common";
 import { useGetGenresQuery } from "src/store/slices/genre";
 import { MAIN_PATH } from "src/constant";
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "src/store";
+import { toggleBookmark } from "src/store/slices/bookmarkSlice";
+import { toggleLike } from "src/store/slices/likesSlice";
 
 interface VideoCardModalProps {
   video: Movie;
@@ -42,6 +48,13 @@ export default function VideoCardModal({
     { mediaType: MEDIA_TYPE.Movie, id: video.id },
     { skip: !video }
   );
+
+  const dispatch = useDispatch();
+  const { bookmarks } = useSelector((state: RootState) => state.bookmarks);
+  const isBookmarked = bookmarks.some((b) => b.id === video.id);
+
+  const { likedMovies } = useSelector((state: RootState) => state.likes);
+  const isLiked = likedMovies.some((m) => m.id === video.id);
 
   const setPortal = usePortal();
   const rect = anchorElement.getBoundingClientRect();
@@ -149,21 +162,27 @@ export default function VideoCardModal({
           <Stack direction="row" spacing={1}>
             <NetflixIconButton
               sx={{ p: 0, color: "text.primary" }}
-              onClick={() => navigate(`/${MAIN_PATH.watch}?id=${video.id}&type=${MEDIA_TYPE.Movie}`)}
+              onClick={() => navigate(`/${MAIN_PATH.watch}?id=${video.id}&type=${video.media_type || MEDIA_TYPE.Movie}`)}
             >
               <PlayCircleIcon sx={{ width: 40, height: 40 }} />
             </NetflixIconButton>
-            <NetflixIconButton sx={{ border: "2px solid rgba(255,255,255,0.4)" }}>
-              <AddIcon />
+            <NetflixIconButton
+              sx={{ border: "2px solid rgba(255,255,255,0.4)" }}
+              onClick={() => dispatch(toggleBookmark(video))}
+            >
+              {isBookmarked ? <CheckIcon /> : <AddIcon />}
             </NetflixIconButton>
-            <NetflixIconButton sx={{ border: "2px solid rgba(255,255,255,0.4)" }}>
-              <ThumbUpOffAltIcon />
+            <NetflixIconButton
+              sx={{ border: "2px solid rgba(255,255,255,0.4)" }}
+              onClick={() => dispatch(toggleLike(video))}
+            >
+              {isLiked ? <ThumbUpIcon /> : <ThumbUpOffAltIcon />}
             </NetflixIconButton>
             <div style={{ flexGrow: 1 }} />
             <NetflixIconButton
               sx={{ border: "2px solid rgba(255,255,255,0.4)" }}
               onClick={() => {
-                setDetailType({ mediaType: MEDIA_TYPE.Movie, id: video.id });
+                setDetailType({ mediaType: (video.media_type as MEDIA_TYPE) || MEDIA_TYPE.Movie, id: video.id });
               }}
             >
               <ExpandMoreIcon />

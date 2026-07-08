@@ -16,10 +16,20 @@ import Logo from "../Logo";
 import SearchBox from "../SearchBox";
 import NetflixNavigationLink from "../NetflixNavigationLink";
 
-const pages = ["My List", "Movies", "Tv Shows"];
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "src/store";
+import { logout } from "src/store/slices/authSlice";
+
+const pages = [
+  { name: "My List", path: "my-list" },
+  { name: "Movies", path: "movies" },
+  { name: "Tv Shows", path: "tvshows" }
+];
 
 const MainHeader = () => {
   const isOffset = useOffSetTop(APP_BAR_HEIGHT);
+  const { activeProfile } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -43,10 +53,14 @@ const MainHeader = () => {
     setAnchorElUser(null);
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    handleCloseUserMenu();
+  };
+
   return (
     <AppBar
       sx={{
-        // px: "4%",
         px: "60px",
         height: APP_BAR_HEIGHT,
         backgroundImage: "none",
@@ -91,8 +105,11 @@ const MainHeader = () => {
             }}
           >
             {pages.map((page) => (
-              <MenuItem key={page} onClick={handleCloseNavMenu}>
-                <Typography textAlign="center">{page}</Typography>
+              <MenuItem key={page.name} onClick={() => {
+                handleCloseNavMenu();
+                // navigate(`/${page.path}`);
+              }}>
+                <Typography textAlign="center">{page.name}</Typography>
               </MenuItem>
             ))}
           </Menu>
@@ -120,12 +137,12 @@ const MainHeader = () => {
         >
           {pages.map((page) => (
             <NetflixNavigationLink
-              to=""
+              to={`/${page.path}`}
               variant="subtitle1"
-              key={page}
+              key={page.name}
               onClick={handleCloseNavMenu}
             >
-              {page}
+              {page.name}
             </NetflixNavigationLink>
           ))}
         </Stack>
@@ -134,7 +151,7 @@ const MainHeader = () => {
           <SearchBox />
           <Tooltip title="Open settings">
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar alt="user_avatar" src="/avatar.png" variant="rounded" />
+              <Avatar alt="user_avatar" src={activeProfile?.avatarUrl || "/avatar.png"} variant="rounded" />
             </IconButton>
           </Tooltip>
           <Menu
@@ -153,11 +170,12 @@ const MainHeader = () => {
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
           >
-            {["Account", "Logout"].map((setting) => (
-              <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                <Typography textAlign="center">{setting}</Typography>
-              </MenuItem>
-            ))}
+            <MenuItem onClick={handleCloseUserMenu}>
+              <Typography textAlign="center">Account</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <Typography textAlign="center">Logout</Typography>
+            </MenuItem>
           </Menu>
         </Box>
       </Toolbar>

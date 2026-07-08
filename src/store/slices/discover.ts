@@ -1,7 +1,7 @@
 import { TMDB_V3_API_KEY } from "src/constant";
 import { tmdbApi } from "./apiSlice";
 import { MEDIA_TYPE, PaginatedMovieResult } from "src/types/Common";
-import { MovieDetail } from "src/types/Movie";
+import { MovieDetail, SeasonDetail } from "src/types/Movie";
 import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 
 const initialState: Record<string, Record<string, PaginatedMovieResult>> = {};
@@ -126,8 +126,17 @@ const extendedApi = tmdbApi.injectEndpoints({
       { query: string; page: number }
     >({
       query: ({ query, page }) => ({
-        url: `/search/movie`,
+        url: `/search/multi`,
         params: { api_key: TMDB_V3_API_KEY, query, page },
+      }),
+    }),
+    getSeasonDetails: build.query<
+      SeasonDetail,
+      { id: number; seasonNumber: number }
+    >({
+      query: ({ id, seasonNumber }) => ({
+        url: `/tv/${id}/season/${seasonNumber}`,
+        params: { api_key: TMDB_V3_API_KEY },
       }),
     }),
   }),
@@ -144,4 +153,6 @@ export const {
   useLazyGetSimilarVideosQuery,
   useSearchMoviesQuery,
   useLazySearchMoviesQuery,
+  useGetSeasonDetailsQuery,
+  useLazyGetSeasonDetailsQuery,
 } = extendedApi;

@@ -51,7 +51,7 @@ export default function VideoPortalContainer() {
           ref={container}
           variants={variant}
           style={{
-            zIndex: 1,
+            zIndex: 9999,
             position: "absolute",
             display: "inline-block",
             ...(rect && {

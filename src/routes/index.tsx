@@ -17,6 +17,14 @@ const router = createBrowserRouter([
         lazy: () => import("src/pages/HomePage"),
       },
       {
+        path: MAIN_PATH.movies,
+        lazy: () => import("src/pages/HomePage"),
+      },
+      {
+        path: MAIN_PATH.tvShows,
+        lazy: () => import("src/pages/HomePage"),
+      },
+      {
         path: MAIN_PATH.genreExplore,
         children: [
           {
@@ -32,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: MAIN_PATH.search,
         lazy: () => import("src/pages/SearchPage"),
+      },
+      {
+        path: MAIN_PATH.myList,
+        lazy: () => import("src/pages/MyListPage"),
       },
     ],
   },
