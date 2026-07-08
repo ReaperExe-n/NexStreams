@@ -39,6 +39,19 @@ const StyledSlider = styled(Slider)(({ theme, padding }: { theme: any; padding: 
   },
 }));
 
+interface SlideItemProps {
+  item: Movie;
+  progress: number;
+}
+
+function SlideItem({ item, progress }: SlideItemProps) {
+  return (
+    <Box sx={{ pr: { xs: 0.5, sm: 1 } }}>
+      <VideoItemWithHover video={item} progress={progress} />
+    </Box>
+  );
+}
+
 export default function ContinueWatchingRow() {
   const { progressList } = useSelector((state: RootState) => state.watchProgress);
   const sliderRef = useRef<Slider>(null);
@@ -105,9 +118,11 @@ export default function ContinueWatchingRow() {
               const percentage = Math.min((progress.progressInSeconds / progress.totalDuration) * 100, 100);
 
               return (
-                <Box key={progress.videoId} sx={{ pr: { xs: 0.5, sm: 1 } }}>
-                  <VideoItemWithHover video={mockMovie as Movie} progress={percentage} />
-                </Box>
+                <SlideItem
+                  key={progress.videoId}
+                  item={mockMovie as Movie}
+                  progress={percentage}
+                />
               );
             })}
           </StyledSlider>
