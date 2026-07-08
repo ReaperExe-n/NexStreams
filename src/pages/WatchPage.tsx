@@ -27,8 +27,8 @@ const BASE_SERVERS: ServerOption[] = [
     badge: "Auto-Resume & Subs",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://vidlink.pro/tv/${id}/${season}/${episode}?player=plyr&primaryColor=e50914&autoplay=false`
-        : `https://vidlink.pro/movie/${id}?player=plyr&primaryColor=e50914&autoplay=false`,
+        ? `https://vidlink.pro/tv/${id}/${season}/${episode}`
+        : `https://vidlink.pro/movie/${id}`,
   },
   {
     key: "cine",
@@ -45,8 +45,8 @@ const BASE_SERVERS: ServerOption[] = [
     badge: "Reliable",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&ep=${episode}`
-        : `https://vidsrc.me/embed/movie?tmdb=${id}`,
+        ? `https://vidsrc.me/embed/tv/${id}/${season}/${episode}`
+        : `https://vidsrc.me/embed/movie/${id}`,
   },
   {
     key: "vidsrc_pro",
