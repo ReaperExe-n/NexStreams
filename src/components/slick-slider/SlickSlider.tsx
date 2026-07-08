@@ -161,6 +161,7 @@ export default function SlickSlider({ data, genre }: SlickSliderProps) {
                 sx={{
                   display: "inline-block",
                   fontWeight: 700,
+                  color: "white",
                 }}
               >
                 {genre.name}

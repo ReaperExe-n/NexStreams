@@ -77,7 +77,7 @@ export default function ContinueWatchingRow() {
   return (
     <Box sx={{ overflow: "hidden", height: "100%", zIndex: 1, mt: 4 }}>
       <Stack spacing={2} direction="row" alignItems="center" sx={{ mb: 2, pl: { xs: "30px", sm: "60px" } }}>
-        <Typography variant="h5" sx={{ display: "inline-block", fontWeight: 700 }}>
+        <Typography variant="h5" sx={{ display: "inline-block", fontWeight: 700, color: "white" }}>
           Continue Watching
         </Typography>
       </Stack>
