@@ -3,6 +3,7 @@ import { Movie } from "src/types/Movie";
 import { usePortal } from "src/providers/PortalProvider";
 import { useGetConfigurationQuery } from "src/store/slices/configuration";
 import VideoItemWithHoverPure from "./VideoItemWithHoverPure";
+
 interface VideoItemWithHoverProps {
   video: Movie;
 }
@@ -10,15 +11,28 @@ interface VideoItemWithHoverProps {
 export default function VideoItemWithHover({ video }: VideoItemWithHoverProps) {
   const setPortal = usePortal();
   const elementRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isHovered, setIsHovered] = useState(false);
 
   const { data: configuration } = useGetConfigurationQuery(undefined);
 
   useEffect(() => {
     if (isHovered) {
-      setPortal(elementRef.current, video);
+      timeoutRef.current = setTimeout(() => {
+        setPortal(elementRef.current, video);
+      }, 400); // 400ms delay to prevent flashing when moving mouse quickly
+    } else {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     }
-  }, [isHovered]);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [isHovered, setPortal, video]);
 
   return (
     <VideoItemWithHoverPure
