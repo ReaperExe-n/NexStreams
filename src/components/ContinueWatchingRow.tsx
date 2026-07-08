@@ -49,7 +49,8 @@ export default function ContinueWatchingRow() {
   if (progressList.length === 0) return null;
 
   const settings: Settings = {
-    speed: 500,
+    speed: 700,
+    cssEase: "cubic-bezier(0.25, 1, 0.5, 1)",
     arrows: false,
     infinite: false,
     lazyLoad: "ondemand",
