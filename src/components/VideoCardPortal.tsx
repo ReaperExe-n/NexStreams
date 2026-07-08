@@ -43,9 +43,9 @@ export default function VideoCardModal({
   const [showVideo, setShowVideo] = useState(false);
 
   const { data: configuration } = useGetConfigurationQuery(undefined);
-  const { data: genres } = useGetGenresQuery(MEDIA_TYPE.Movie);
+  const { data: genres } = useGetGenresQuery(video.media_type === "tv" ? MEDIA_TYPE.Tv : MEDIA_TYPE.Movie);
   const { data: movieDetail } = useGetAppendedVideosQuery(
-    { mediaType: MEDIA_TYPE.Movie, id: video.id },
+    { mediaType: video.media_type === "tv" ? MEDIA_TYPE.Tv : MEDIA_TYPE.Movie, id: video.id },
     { skip: !video }
   );
 
