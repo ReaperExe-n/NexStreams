@@ -121,6 +121,15 @@ const extendedApi = tmdbApi.injectEndpoints({
         params: { api_key: TMDB_V3_API_KEY },
       }),
     }),
+    searchMovies: build.query<
+      PaginatedMovieResult,
+      { query: string; page: number }
+    >({
+      query: ({ query, page }) => ({
+        url: `/search/movie`,
+        params: { api_key: TMDB_V3_API_KEY, query, page },
+      }),
+    }),
   }),
 });
 
@@ -133,4 +142,6 @@ export const {
   useLazyGetAppendedVideosQuery,
   useGetSimilarVideosQuery,
   useLazyGetSimilarVideosQuery,
+  useSearchMoviesQuery,
+  useLazySearchMoviesQuery,
 } = extendedApi;

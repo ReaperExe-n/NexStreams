@@ -1,7 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { MAIN_PATH } from "src/constant";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -36,6 +38,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function SearchBox() {
   const [isFocused, setIsFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q") || "";
+  const [inputValue, setInputValue] = useState(query);
+
+  // Sync state with URL parameter if it changes externally
+  useEffect(() => {
+    setInputValue(query);
+    if (query) {
+      setIsFocused(true);
+    }
+  }, [query]);
 
   const handleClickSearchIcon = () => {
     if (!isFocused) {
@@ -43,10 +57,20 @@ export default function SearchBox() {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    if (value.trim()) {
+      navigate(`/${MAIN_PATH.search}?q=${encodeURIComponent(value)}`, { replace: true });
+    } else {
+      navigate(`/${MAIN_PATH.browse}`);
+    }
+  };
+
   return (
     <Search
       sx={
-        isFocused ? { border: "1px solid white", backgroundColor: "black" } : {}
+        isFocused || inputValue ? { border: "1px solid white", backgroundColor: "black" } : {}
       }
     >
       <SearchIconWrapper onClick={handleClickSearchIcon}>
@@ -55,13 +79,18 @@ export default function SearchBox() {
       <StyledInputBase
         inputRef={searchInputRef}
         placeholder="Titles, people, genres"
+        value={inputValue}
+        onChange={handleInputChange}
         inputProps={{
           "aria-label": "search",
           onFocus: () => {
             setIsFocused(true);
           },
           onBlur: () => {
-            setIsFocused(false);
+            // Keep focused outline if there's text inside
+            if (!inputValue) {
+              setIsFocused(false);
+            }
           },
         }}
       />
