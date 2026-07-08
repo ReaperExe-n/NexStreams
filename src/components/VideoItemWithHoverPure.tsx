@@ -5,6 +5,7 @@ type VideoItemWithHoverPureType = {
   innerRef: ForwardedRef<HTMLDivElement>;
   handleHover: (value: boolean) => void;
   progress?: number;
+  title?: string;
 };
 
 class VideoItemWithHoverPure extends PureComponent<VideoItemWithHoverPureType> {
@@ -39,6 +40,33 @@ class VideoItemWithHoverPure extends PureComponent<VideoItemWithHoverPureType> {
             this.props.handleHover(false);
           }}
         />
+        {this.props.title && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              padding: this.props.progress !== undefined ? "20px 10px 15px 10px" : "20px 10px 10px 10px",
+              background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%)",
+              color: "white",
+              fontSize: "1rem",
+              fontWeight: 700,
+              textShadow: "1px 1px 3px rgba(0,0,0,0.8)",
+              pointerEvents: "none",
+              display: "flex",
+              alignItems: "flex-end",
+              boxSizing: "border-box",
+              textTransform: "uppercase",
+              fontFamily: "Netflix Sans, Helvetica Neue, Helvetica, Arial, sans-serif",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {this.props.title}
+          </div>
+        )}
         {this.props.progress !== undefined && (
           <div
             style={{

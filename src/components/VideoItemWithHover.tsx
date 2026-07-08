@@ -41,6 +41,7 @@ export default function VideoItemWithHover({ video, progress }: VideoItemWithHov
       handleHover={setIsHovered}
       src={`${configuration?.images.base_url}w300${video.backdrop_path}`}
       progress={progress}
+      title={video.title || video.name || video.original_title}
     />
   );
 }
