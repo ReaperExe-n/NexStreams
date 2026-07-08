@@ -200,11 +200,10 @@ export default function DetailModal() {
                         <Typography
                           variant="subtitle1"
                           sx={{ color: "success.main" }}
-                        >{`${getRandomNumber(100)}% Match`}</Typography>
+                        >{`${Math.round((detail.mediaDetail?.vote_average || 0) * 10)}% Match`}</Typography>
                         <Typography variant="body2">
                           {(detail.mediaDetail?.release_date || detail.mediaDetail?.first_air_date || "").substring(0, 4)}
                         </Typography>
-                        <AgeLimitChip label={`${getRandomNumber(20)}+`} />
                         <Typography variant="subtitle2">
                           {detail.mediaDetail?.runtime
                             ? formatMinuteToReadable(detail.mediaDetail.runtime)

@@ -192,8 +192,7 @@ export default function VideoCardModal({
             <Typography
               variant="subtitle2"
               sx={{ color: "success.main", fontWeight: 700 }}
-            >{`${getRandomNumber(100)}% Match`}</Typography>
-            <AgeLimitChip label={`${getRandomNumber(20)}+`} />
+            >{`${Math.round((video.vote_average || 0) * 10)}% Match`}</Typography>
             <Typography variant="body2">
               {movieDetail?.runtime
                 ? formatMinuteToReadable(movieDetail.runtime)

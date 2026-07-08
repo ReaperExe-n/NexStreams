@@ -61,9 +61,8 @@ export default function SimilarVideoCard({ video }: SimilarVideoCardProps) {
               <Typography
                 variant="subtitle2"
                 sx={{ color: "success.main" }}
-              >{`${getRandomNumber(100)}% Match`}</Typography>
+              >{`${Math.round((video.vote_average || 0) * 10)}% Match`}</Typography>
               <Stack direction="row" spacing={1} alignItems="center">
-                <AgeLimitChip label={`${getRandomNumber(20)}+`} />
                 <Typography variant="body2">
                   {(video.release_date || video.first_air_date || "").substring(0, 4)}
                 </Typography>
