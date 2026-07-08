@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Box, Typography, Select, MenuItem, Stack, Button, CircularProgress, IconButton, Drawer, Divider } from "@mui/material";
-import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
-import CloseIcon from "@mui/icons-material/Close";
+import { Box, Typography, Select, MenuItem, Stack, CircularProgress } from "@mui/material";
 import { Season } from "src/types/Movie";
 import { useGetSeasonDetailsQuery } from "src/store/slices/discover";
 import { useGetConfigurationQuery } from "src/store/slices/configuration";
@@ -10,9 +8,10 @@ interface TvPlayerUIProps {
   showId: number;
   seasons: Season[];
   getServerUrl: (id: string, mediaType: string, season?: number, episode?: number) => string;
+  actionButtons?: React.ReactNode;
 }
 
-export default function TvPlayerUI({ showId, seasons, getServerUrl }: TvPlayerUIProps) {
+export default function TvPlayerUI({ showId, seasons, getServerUrl, actionButtons }: TvPlayerUIProps) {
   const validSeasons = seasons.filter((s) => s.season_number > 0);
   const [selectedSeason, setSelectedSeason] = useState<number>(
     validSeasons.length > 0 ? validSeasons[0].season_number : 1
@@ -35,9 +34,9 @@ export default function TvPlayerUI({ showId, seasons, getServerUrl }: TvPlayerUI
   const currentEmbedUrl = getServerUrl(showId.toString(), "tv", selectedSeason, selectedEpisode);
 
   return (
-    <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ width: "100%", display: "flex", flexDirection: "column", bgcolor: "#0f0f0f", minHeight: "100vh" }}>
       {/* Video Player */}
-      <Box sx={{ flex: 1, position: "relative", bgcolor: "black" }}>
+      <Box sx={{ width: "100%", height: { xs: "50vh", sm: "60vh", md: "80vh" }, position: "relative", bgcolor: "black" }}>
         <iframe
           key={currentEmbedUrl}
           src={currentEmbedUrl}
@@ -48,130 +47,133 @@ export default function TvPlayerUI({ showId, seasons, getServerUrl }: TvPlayerUI
           allow="autoplay; encrypted-media"
           style={{ position: "absolute", top: 0, left: 0 }}
         />
-        {/* Floating Episodes Button */}
-        <IconButton
-          onClick={() => setDrawerOpen(true)}
-          sx={{
-            position: "absolute",
-            bottom: 40,
-            right: 40,
-            zIndex: 10001,
-            bgcolor: "rgba(0,0,0,0.6)",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.3)",
-            "&:hover": { bgcolor: "white", color: "black" },
-            width: 56,
-            height: 56,
-          }}
-        >
-          <VideoLibraryIcon fontSize="large" />
-        </IconButton>
       </Box>
 
-      {/* Episode Selector Drawer */}
-      <Drawer
-        anchor="right"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        PaperProps={{
-          sx: {
-            width: { xs: "100%", sm: 400 },
-            bgcolor: "rgba(18,18,18,0.95)",
-            backdropFilter: "blur(10px)",
-            color: "white",
-            borderLeft: "1px solid rgba(255,255,255,0.1)",
-          },
-        }}
-      >
-        {/* Header / Season Selector */}
-        <Box sx={{ p: 2, borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="h6" fontWeight={700}>Episodes</Typography>
-            <Select
-              value={selectedSeason}
-              onChange={(e) => handleSeasonChange(Number(e.target.value))}
-              size="small"
-              sx={{
-                bgcolor: "rgba(255,255,255,0.05)",
-                color: "white",
-                minWidth: 120,
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.2)" },
-                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.5)" },
-                "& .MuiSvgIcon-root": { color: "white" },
-              }}
-            >
-              {validSeasons.map((season) => (
-                <MenuItem key={season.id} value={season.season_number}>
-                  {season.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </Stack>
-          <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: "white" }}>
-            <CloseIcon />
-          </IconButton>
+      {/* Action Buttons passed from WatchPage */}
+      {actionButtons && (
+        <Box sx={{ px: { xs: 2, md: 6 }, pt: 2 }}>
+          {actionButtons}
         </Box>
+      )}
 
-        {/* Episodes List */}
-        <Box sx={{ flex: 1, overflowY: "auto", p: 1 }}>
-          {isFetching ? (
-            <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-              <CircularProgress color="inherit" size={30} />
-            </Box>
-          ) : (
-            seasonDetail?.episodes?.map((episode) => {
+      {/* Episode Selector Area */}
+      <Box sx={{ px: { xs: 2, md: 6 }, py: 4 }}>
+        <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+          <Typography variant="h5" fontWeight={700} color="white">
+            Select Season
+          </Typography>
+          <Select
+            value={selectedSeason}
+            onChange={(e) => handleSeasonChange(Number(e.target.value))}
+            size="small"
+            sx={{
+              bgcolor: "rgba(255,255,255,0.1)",
+              color: "white",
+              minWidth: 140,
+              fontWeight: "bold",
+              "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+              "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+              "& .MuiSvgIcon-root": { color: "white" },
+            }}
+          >
+            {validSeasons.map((season) => (
+              <MenuItem key={season.id} value={season.season_number}>
+                {season.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </Stack>
+
+        {isFetching ? (
+          <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+            <CircularProgress color="error" />
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: 3,
+            }}
+          >
+            {seasonDetail?.episodes?.map((episode) => {
               const isActive = selectedEpisode === episode.episode_number;
+              const hasImage = !!episode.still_path;
+              const imageUrl = hasImage
+                ? `${configuration?.images.base_url}w300${episode.still_path}`
+                : "https://via.placeholder.com/300x169?text=No+Image";
+
               return (
-                <Button
+                <Box
                   key={episode.id}
-                  onClick={() => {
-                    setSelectedEpisode(episode.episode_number);
-                    setDrawerOpen(false); // auto-close
-                  }}
+                  onClick={() => setSelectedEpisode(episode.episode_number)}
                   sx={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    textTransform: "none",
-                    color: "white",
-                    p: 1.5,
-                    mb: 0.5,
+                    cursor: "pointer",
                     borderRadius: 2,
-                    bgcolor: isActive ? "rgba(255,255,255,0.1)" : "transparent",
-                    borderLeft: isActive ? "4px solid #E50914" : "4px solid transparent",
+                    overflow: "hidden",
+                    bgcolor: "rgba(255,255,255,0.03)",
+                    transition: "transform 0.2s, background-color 0.2s",
+                    border: isActive ? "2px solid #E50914" : "2px solid transparent",
                     "&:hover": {
-                      bgcolor: "rgba(255,255,255,0.05)",
+                      transform: "scale(1.03)",
+                      bgcolor: "rgba(255,255,255,0.08)",
                     },
                   }}
                 >
-                  <Typography variant="h6" sx={{ width: 30, color: isActive ? "white" : "text.secondary", textAlign: "center" }}>
-                    {episode.episode_number}
-                  </Typography>
-                  <Box sx={{ position: "relative", width: 120, height: 68, flexShrink: 0, mx: 2, borderRadius: 1, overflow: "hidden" }}>
+                  <Box sx={{ position: "relative", width: "100%", aspectRatio: "16/9" }}>
                     <img
-                      src={
-                        episode.still_path
-                          ? `${configuration?.images.base_url}w185${episode.still_path}`
-                          : "https://via.placeholder.com/120x68?text=No+Image"
-                      }
-                      style={{ width: "100%", height: "100%", objectFit: "cover", opacity: isActive ? 1 : 0.7 }}
+                      src={imageUrl}
+                      alt={episode.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", opacity: isActive ? 1 : 0.8 }}
                     />
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 8,
+                        right: 8,
+                        bgcolor: "rgba(0,0,0,0.8)",
+                        color: "white",
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 1,
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {`${selectedSeason}x${episode.episode_number}`}
+                    </Box>
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 8,
+                        left: 8,
+                        bgcolor: "rgba(229,9,20,0.9)",
+                        color: "white",
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 1,
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        display: isActive ? "block" : "none",
+                      }}
+                    >
+                      PLAYING
+                    </Box>
                   </Box>
-                  <Box sx={{ flex: 1, textAlign: "left", overflow: "hidden" }}>
-                    <Typography variant="body2" fontWeight={isActive ? 700 : 500} noWrap>
-                      {episode.name}
+                  <Box sx={{ p: 2 }}>
+                    <Typography variant="subtitle1" fontWeight={isActive ? 700 : 500} color="white" noWrap>
+                      {episode.episode_number}. {episode.name}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block" }}>
-                      {episode.runtime ? `${episode.runtime}m` : ""}
+                    <Typography variant="body2" color="text.secondary" mt={0.5}>
+                      {episode.runtime ? `${episode.runtime}m` : "TBA"} • {episode.air_date || "Unknown date"}
                     </Typography>
                   </Box>
-                </Button>
+                </Box>
               );
-            })
-          )}
-        </Box>
-      </Drawer>
+            })}
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 }

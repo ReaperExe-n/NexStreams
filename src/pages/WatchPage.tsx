@@ -187,20 +187,79 @@ export function Component() {
   const embedUrl = currentServer.getUrl ? currentServer.getUrl(id, mediaType) : "";
   const title = movieDetail?.title || movieDetail?.name || "";
 
+  const actionButtons = (
+    <Stack direction="row" spacing={2} sx={{ width: "100%", flexWrap: "wrap", gap: 2 }}>
+      {servers.length > 1 && (
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<DnsIcon />}
+          onClick={handleFixLag}
+          sx={{
+            borderRadius: "30px",
+            textTransform: "none",
+            fontWeight: "bold",
+            px: 3,
+            height: 48,
+            bgcolor: "rgba(229, 9, 20, 0.9)",
+            "&:hover": {
+              bgcolor: "rgba(229, 9, 20, 1)",
+              transform: "scale(1.05)",
+            },
+            transition: "all 0.2s ease-in-out",
+          }}
+        >
+          Fix Lag / Change Server
+        </Button>
+      )}
+
+      <Button
+        variant="outlined"
+        color="error"
+        startIcon={<FlagIcon />}
+        onClick={handleReportVideo}
+        disabled={isReported}
+        sx={{
+          borderRadius: "30px",
+          textTransform: "none",
+          bgcolor: isReported ? "rgba(244, 67, 54, 0.15)" : "transparent",
+          color: isReported ? "error.main" : "white",
+          borderColor: "error.main",
+          borderWidth: "1.5px",
+          fontWeight: "bold",
+          px: 2.5,
+          height: 48,
+          "&:hover": {
+            bgcolor: "rgba(244, 67, 54, 0.25)",
+            borderColor: "error.main",
+            borderWidth: "1.5px",
+          },
+          "&.Mui-disabled": {
+            color: "rgba(244, 67, 54, 0.7)",
+            borderColor: "rgba(244, 67, 54, 0.4)",
+            bgcolor: "rgba(244, 67, 54, 0.08)",
+          },
+          transition: "all 0.2s ease",
+        }}
+      >
+        {isReported ? "Reported Broken" : "Report Video"}
+      </Button>
+    </Stack>
+  );
+
   return (
     <Box
       sx={{
-        position: "fixed",
+        position: "absolute",
         top: 0,
         left: 0,
-        width: "100vw",
-        height: "100vh",
-        bgcolor: "black",
+        width: "100%",
+        minHeight: "100vh",
+        bgcolor: "#0f0f0f",
         zIndex: 9999,
-        overflow: "hidden",
       }}
     >
-      {/* Floating Header Bar */}
+      {/* Floating Back Button */}
       <Box
         sx={{
           position: "absolute",
@@ -209,99 +268,37 @@ export function Component() {
           right: 0,
           p: 3,
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
           background: "linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)",
           zIndex: 10000,
-          pointerEvents: "none", // Let clicks pass through to the iframe below
+          pointerEvents: "none",
         }}
       >
-        {/* Left Actions: Back Button & Report Button */}
-        <Stack direction="row" spacing={2} sx={{ pointerEvents: "auto" }}>
-          {/* Back Button */}
-          <IconButton
-            onClick={handleGoBack}
-            sx={{
-              bgcolor: "rgba(0, 0, 0, 0.6)",
-              color: "white",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              "&:hover": {
-                bgcolor: "rgba(0, 0, 0, 0.9)",
-                color: "red",
-                transform: "scale(1.05)",
-              },
-              transition: "all 0.2s ease-in-out",
-              width: 48,
-              height: 48,
-            }}
-          >
-            <KeyboardBackspaceIcon sx={{ fontSize: 28 }} />
-          </IconButton>
-
-          {/* Report Button */}
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<FlagIcon />}
-            onClick={handleReportVideo}
-            disabled={isReported}
-            sx={{
-              borderRadius: "30px",
-              textTransform: "none",
-              bgcolor: isReported ? "rgba(244, 67, 54, 0.15)" : "rgba(0, 0, 0, 0.6)",
-              color: isReported ? "error.main" : "white",
-              borderColor: "error.main",
-              borderWidth: "1.5px",
-              fontWeight: "bold",
-              px: 2.5,
-              height: 48,
-              "&:hover": {
-                bgcolor: "rgba(244, 67, 54, 0.25)",
-                borderColor: "error.main",
-                borderWidth: "1.5px",
-              },
-              "&.Mui-disabled": {
-                color: "rgba(244, 67, 54, 0.7)",
-                borderColor: "rgba(244, 67, 54, 0.4)",
-                bgcolor: "rgba(244, 67, 54, 0.08)",
-              },
-              transition: "all 0.2s ease",
-            }}
-          >
-            {isReported ? "Reported Broken" : "Report Video"}
-          </Button>
-        </Stack>
-
-        {/* Fix Lag Button */}
-        {servers.length > 1 && (
-          <Button
-            variant="contained"
-            color="error"
-            startIcon={<DnsIcon />}
-            onClick={handleFixLag}
-            sx={{
-              pointerEvents: "auto",
-              borderRadius: "30px",
-              textTransform: "none",
-              fontWeight: "bold",
-              px: 3,
-              height: 48,
-              bgcolor: "rgba(229, 9, 20, 0.9)",
-              "&:hover": {
-                bgcolor: "rgba(229, 9, 20, 1)",
-                transform: "scale(1.05)",
-              },
-              transition: "all 0.2s ease-in-out",
-            }}
-          >
-            Fix Lag / Change Server
-          </Button>
-        )}
-        </Box>
+        <IconButton
+          onClick={handleGoBack}
+          sx={{
+            pointerEvents: "auto",
+            bgcolor: "rgba(0, 0, 0, 0.6)",
+            color: "white",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            "&:hover": {
+              bgcolor: "rgba(0, 0, 0, 0.9)",
+              color: "red",
+              transform: "scale(1.05)",
+            },
+            transition: "all 0.2s ease-in-out",
+            width: 48,
+            height: 48,
+          }}
+        >
+          <KeyboardBackspaceIcon sx={{ fontSize: 28 }} />
+        </IconButton>
+      </Box>
 
       {/* Movie/TV Stream Iframe, TvPlayerUI, or DramaPlayer */}
       {activeServer === "dramacool" ? (
-        <DramaPlayer title={title} />
+        <Box sx={{ width: "100%", height: "100vh" }}>
+          <DramaPlayer title={title} />
+        </Box>
       ) : mediaType === "tv" && movieDetail?.seasons ? (
         <TvPlayerUI 
           showId={Number(id)}
@@ -309,19 +306,26 @@ export function Component() {
           getServerUrl={(showId, mType, season, episode) => 
             currentServer.getUrl ? currentServer.getUrl(showId, mType, season, episode) : ""
           }
+          actionButtons={actionButtons}
         />
       ) : (
-        <iframe
-          src={embedUrl}
-          width="100%"
-          height="100%"
-          frameBorder="0"
-          allowFullScreen
-          allow="autoplay; encrypted-media"
-          style={{ position: "absolute", top: 0, left: 0 }}
-        />
+        <Box sx={{ width: "100%", display: "flex", flexDirection: "column", bgcolor: "#0f0f0f", minHeight: "100vh" }}>
+          <Box sx={{ width: "100%", height: { xs: "50vh", sm: "60vh", md: "80vh" }, position: "relative", bgcolor: "black" }}>
+            <iframe
+              src={embedUrl}
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              allowFullScreen
+              allow="autoplay; encrypted-media"
+              style={{ position: "absolute", top: 0, left: 0 }}
+            />
+          </Box>
+          <Box sx={{ px: { xs: 2, md: 6 }, py: 4 }}>
+             {actionButtons}
+          </Box>
+        </Box>
       )}
-
     </Box>
   );
 }
