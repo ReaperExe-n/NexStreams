@@ -1,5 +1,6 @@
+import React from "react";
 import Stack from "@mui/material/Stack";
-import { COMMON_TITLES } from "src/constant";
+import { MOVIE_COMMON_TITLES, TV_COMMON_TITLES } from "src/constant";
 import HeroSection from "src/components/HeroSection";
 import { genreSliceEndpoints, useGetGenresQuery } from "src/store/slices/genre";
 import { MEDIA_TYPE } from "src/types/Common";
@@ -24,20 +25,47 @@ export async function loader() {
 }
 export function Component() {
   const location = useLocation();
-  const mediaType = location.pathname.includes(MAIN_PATH.tvShows)
-    ? MEDIA_TYPE.Tv
-    : MEDIA_TYPE.Movie;
+  const isBrowse = location.pathname.includes(MAIN_PATH.browse) || location.pathname === "/";
+  const isTv = location.pathname.includes(MAIN_PATH.tvShows);
+  const mediaType = isTv ? MEDIA_TYPE.Tv : MEDIA_TYPE.Movie;
 
-  const { data: genres, isSuccess } = useGetGenresQuery(mediaType);
+  const { data: movieGenres } = useGetGenresQuery(MEDIA_TYPE.Movie);
+  const { data: tvGenres } = useGetGenresQuery(MEDIA_TYPE.Tv);
 
-  if (isSuccess && genres && genres.length > 0) {
+  const genres = isTv ? tvGenres : movieGenres;
+  const customGenres = isTv ? TV_COMMON_TITLES : MOVIE_COMMON_TITLES;
+
+  if (movieGenres && tvGenres) {
+    if (isBrowse) {
+       // Render MIXED page
+       return (
+         <Stack spacing={2} sx={{ pb: 10 }}>
+           <HeroSection mediaType={MEDIA_TYPE.Movie} />
+           <RecommendedRow />
+           <ContinueWatchingRow />
+           <SliderRowForDrama />
+           <SliderRowForGenre genre={MOVIE_COMMON_TITLES[0]} mediaType={MEDIA_TYPE.Movie} />
+           <SliderRowForGenre genre={TV_COMMON_TITLES[0]} mediaType={MEDIA_TYPE.Tv} />
+           <SliderRowForGenre genre={MOVIE_COMMON_TITLES[1]} mediaType={MEDIA_TYPE.Movie} />
+           <SliderRowForGenre genre={TV_COMMON_TITLES[1]} mediaType={MEDIA_TYPE.Tv} />
+           {movieGenres.slice(0, 5).map((g, i) => (
+             <React.Fragment key={g.id}>
+               <SliderRowForGenre genre={g} mediaType={MEDIA_TYPE.Movie} />
+               {tvGenres[i] && <SliderRowForGenre genre={tvGenres[i]} mediaType={MEDIA_TYPE.Tv} />}
+             </React.Fragment>
+           ))}
+         </Stack>
+       )
+    }
+
+    // Render purely Movies or purely TV Shows
     return (
-      <Stack spacing={2}>
+      <Stack spacing={2} sx={{ pb: 10 }}>
         <HeroSection mediaType={mediaType} />
-        <RecommendedRow />
+        {mediaType === MEDIA_TYPE.Movie && <RecommendedRow />}
         <ContinueWatchingRow />
         {mediaType === MEDIA_TYPE.Movie && <SliderRowForDrama />}
-        {[...COMMON_TITLES, ...genres].map((genre: Genre | CustomGenre) => (
+        {[...customGenres, ...genres].map((genre: Genre | CustomGenre) => (
           <SliderRowForGenre
             key={genre.id || genre.name}
             genre={genre}

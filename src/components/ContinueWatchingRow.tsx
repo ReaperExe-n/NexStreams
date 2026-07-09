@@ -54,12 +54,19 @@ function SlideItem({ item, progress }: SlideItemProps) {
 
 export default function ContinueWatchingRow() {
   const { progressList } = useSelector((state: RootState) => state.watchProgress);
+  
+  // Filter out duplicate videoIds (so we don't show the same TV show multiple times)
+  // Since progressList is already sorted by timestamp descending, findIndex will naturally pick the most recent one.
+  const uniqueProgressList = progressList.filter(
+    (p, index, self) => index === self.findIndex((t) => String(t.videoId) === String(p.videoId))
+  );
+
   const sliderRef = useRef<Slider>(null);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [isEnd, setIsEnd] = useState(false);
   const theme = useTheme();
 
-  if (progressList.length === 0) return null;
+  if (uniqueProgressList.length === 0) return null;
 
   const settings: Settings = {
     speed: 700,
@@ -105,7 +112,7 @@ export default function ContinueWatchingRow() {
           activeSlideIndex={activeSlideIndex}
         >
           <StyledSlider ref={sliderRef} {...settings} padding={ARROW_MAX_WIDTH} theme={theme}>
-            {progressList.map((progress) => {
+            {uniqueProgressList.map((progress) => {
               // Convert WatchProgress to a partial Movie object that VideoItemWithHover expects
               const mockMovie: any = {
                 id: progress.videoId,

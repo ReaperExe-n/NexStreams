@@ -1,6 +1,6 @@
 import {
-  Link as RouterLink,
-  LinkProps as RouterLinkProps,
+  NavLink as RouterNavLink,
+  NavLinkProps as RouterNavLinkProps,
 } from "react-router-dom";
 import Link, { LinkProps } from "@mui/material/Link";
 
@@ -8,12 +8,25 @@ export default function NetflixNavigationLink({
   sx,
   children,
   ...others
-}: LinkProps & RouterLinkProps) {
+}: LinkProps & RouterNavLinkProps) {
   return (
     <Link
       {...others}
-      component={RouterLink}
-      sx={{ color: "text.primary", textDecoration: "none", ...sx }}
+      component={RouterNavLink}
+      sx={[
+        { 
+          color: "text.secondary", 
+          textDecoration: "none", 
+          transition: "color 0.2s",
+          "&:hover": { color: "text.primary" },
+          "&.active": {
+            color: "text.primary",
+            fontWeight: "bold",
+            cursor: "default"
+          }
+        },
+        ...(Array.isArray(sx) ? sx : [sx])
+      ]}
     >
       {children}
     </Link>

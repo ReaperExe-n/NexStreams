@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface WatchProgress {
   videoId: string | number;
+  seasonNumber?: number;
+  episodeNumber?: number;
   progressInSeconds: number;
   totalDuration: number;
   mediaType: string;
@@ -34,8 +36,9 @@ export const watchProgressSlice = createSlice({
   initialState,
   reducers: {
     updateProgress: (state, action: PayloadAction<WatchProgress>) => {
+      const { videoId, seasonNumber, episodeNumber } = action.payload;
       const existingIndex = state.progressList.findIndex(
-        (p) => p.videoId === action.payload.videoId
+        (p) => p.videoId === videoId && p.seasonNumber === seasonNumber && p.episodeNumber === episodeNumber
       );
 
       if (existingIndex !== -1) {

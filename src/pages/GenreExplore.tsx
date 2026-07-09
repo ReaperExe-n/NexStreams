@@ -3,7 +3,7 @@ import {
   useLoaderData,
   // useParams
 } from "react-router-dom";
-import { COMMON_TITLES } from "src/constant";
+import { MOVIE_COMMON_TITLES, TV_COMMON_TITLES } from "src/constant";
 import GridPage from "src/components/GridPage";
 import { MEDIA_TYPE } from "src/types/Common";
 import { CustomGenre, Genre } from "src/types/Genre";
@@ -14,7 +14,7 @@ import {
 import store from "src/store";
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  let genre: CustomGenre | Genre | undefined = COMMON_TITLES.find(
+  let genre: CustomGenre | Genre | undefined = [...MOVIE_COMMON_TITLES, ...TV_COMMON_TITLES].find(
     (t) => t.apiString === (params.genreId as string)
   );
   if (!genre) {

@@ -13,6 +13,10 @@ import { Season } from "src/types/Movie";
 import { useGetConfigurationQuery } from "src/store/slices/configuration";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import { formatMinuteToReadable } from "src/utils/common";
+import { useSelector } from "react-redux";
+import { RootState } from "src/store";
+import { useNavigate } from "react-router-dom";
+import { MAIN_PATH } from "src/constant";
 
 interface EpisodesSectionProps {
   showId: number;
@@ -20,7 +24,6 @@ interface EpisodesSectionProps {
 }
 
 export default function EpisodesSection({ showId, seasons }: EpisodesSectionProps) {
-  // Filter out season 0 (usually Specials) if needed, or just select the first one.
   const validSeasons = seasons.filter((s) => s.season_number > 0);
   const [selectedSeason, setSelectedSeason] = useState<number>(
     validSeasons.length > 0 ? validSeasons[0].season_number : 1
@@ -32,6 +35,8 @@ export default function EpisodesSection({ showId, seasons }: EpisodesSectionProp
   );
 
   const { data: configuration } = useGetConfigurationQuery(undefined);
+  const { progressList } = useSelector((state: RootState) => state.watchProgress);
+  const navigate = useNavigate();
 
   if (!seasons || seasons.length === 0) return null;
 
@@ -50,17 +55,15 @@ export default function EpisodesSection({ showId, seasons }: EpisodesSectionProp
           value={selectedSeason}
           onChange={(e) => setSelectedSeason(Number(e.target.value))}
           size="small"
+          MenuProps={{ disableScrollLock: true }}
           sx={{
-            bgcolor: "#242424",
-            color: "white",
+            color: "text.primary",
+            "& .MuiSelect-icon": { color: "text.primary" },
             "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.2)",
+              borderColor: "rgba(255,255,255,0.3)",
             },
             "&:hover .MuiOutlinedInput-notchedOutline": {
               borderColor: "rgba(255,255,255,0.5)",
-            },
-            "& .MuiSvgIcon-root": {
-              color: "white",
             },
           }}
         >
@@ -72,90 +75,102 @@ export default function EpisodesSection({ showId, seasons }: EpisodesSectionProp
         </Select>
       </Stack>
 
-      <Box>
-        {isFetching ? (
-          <Typography>Loading episodes...</Typography>
-        ) : (
-          seasonDetail?.episodes?.map((episode, index) => (
-            <Box key={episode.id}>
-              <Stack
-                direction="row"
-                spacing={2}
-                sx={{
-                  py: 2,
-                  px: 2,
-                  borderRadius: 1,
-                  cursor: "pointer",
-                  "&:hover": {
-                    bgcolor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                alignItems="center"
-              >
-                <Typography variant="h4" color="text.secondary" sx={{ width: 40 }}>
-                  {episode.episode_number}
-                </Typography>
-                
-                <Box sx={{ position: "relative", width: 130, height: 73, flexShrink: 0 }}>
-                  <img
-                    src={`${configuration?.images.base_url}w185${episode.still_path}`}
-                    alt={episode.name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      borderRadius: 4,
-                    }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://via.placeholder.com/130x73?text=No+Image";
-                    }}
-                  />
-                  <PlayCircleOutlineIcon
-                    sx={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      color: "white",
-                      fontSize: 32,
-                      opacity: 0.8,
-                    }}
-                  />
-                </Box>
+      <Divider sx={{ mb: 2, borderColor: "rgba(255,255,255,0.1)" }} />
 
-                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography variant="subtitle1" fontWeight={600} noWrap>
-                      {episode.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {episode.runtime ? formatMinuteToReadable(episode.runtime) : ""}
-                    </Typography>
-                  </Stack>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      mt: 0.5,
-                    }}
-                  >
-                    {episode.overview}
+      {isFetching ? (
+        <Typography>Loading episodes...</Typography>
+      ) : (
+        <Stack spacing={0}>
+          {seasonDetail?.episodes?.map((episode) => {
+            const epProgress = progressList.find(
+              (p) => p.videoId === showId && p.seasonNumber === selectedSeason && p.episodeNumber === episode.episode_number
+            );
+            const percentage = epProgress ? Math.min((epProgress.progressInSeconds / epProgress.totalDuration) * 100, 100) : 0;
+
+            return (
+              <Box key={episode.id}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{
+                    py: 2,
+                    px: 1,
+                    borderRadius: 1,
+                    cursor: "pointer",
+                    transition: "background-color 0.2s",
+                    "&:hover": {
+                      bgcolor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                  alignItems="center"
+                  onClick={() => navigate(`/${MAIN_PATH.watch}?id=${showId}&type=tv&s=${selectedSeason}&e=${episode.episode_number}`)}
+                >
+                  <Typography variant="h4" color="text.secondary" sx={{ width: 40, textAlign: "center" }}>
+                    {episode.episode_number}
                   </Typography>
-                </Box>
-              </Stack>
-              {index < seasonDetail.episodes.length - 1 && (
-                <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
-              )}
-            </Box>
-          ))
-        )}
-      </Box>
+                  
+                  <Box sx={{ position: "relative", width: 130, height: 73, flexShrink: 0, borderRadius: 1, overflow: "hidden" }}>
+                    <img
+                      src={`${configuration?.images.base_url}w185${episode.still_path}`}
+                      alt={episode.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://via.placeholder.com/130x73?text=No+Image";
+                      }}
+                    />
+                    <PlayCircleOutlineIcon
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        color: "white",
+                        fontSize: 32,
+                        opacity: 0.8,
+                      }}
+                    />
+                    {percentage > 0 && (
+                      <Box sx={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 4, bgcolor: "rgba(255,255,255,0.3)" }}>
+                        <Box sx={{ height: "100%", width: `${percentage}%`, bgcolor: "error.main" }} />
+                      </Box>
+                    )}
+                  </Box>
+
+                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="subtitle1" fontWeight={600} noWrap>
+                        {episode.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {episode.runtime ? formatMinuteToReadable(episode.runtime) : ""}
+                      </Typography>
+                    </Stack>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        mt: 0.5,
+                      }}
+                    >
+                      {episode.overview}
+                    </Typography>
+                  </Box>
+                </Stack>
+                <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+              </Box>
+            );
+          })}
+        </Stack>
+      )}
     </Container>
   );
 }

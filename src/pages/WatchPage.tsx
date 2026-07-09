@@ -5,7 +5,8 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import DnsIcon from "@mui/icons-material/Dns";
 import FlagIcon from "@mui/icons-material/Flag";
 import { useGetAppendedVideosQuery } from "src/store/slices/discover";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "src/store";
 import { updateProgress } from "src/store/slices/watchProgressSlice";
 import { MEDIA_TYPE } from "src/types/Common";
 import DramaPlayer from "src/components/DramaPlayer";
@@ -27,8 +28,8 @@ const BASE_SERVERS: ServerOption[] = [
     badge: "Auto-Resume & Subs",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://vidlink.pro/tv/${id}/${season}/${episode}`
-        : `https://vidlink.pro/movie/${id}`,
+        ? `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=false`
+        : `https://vidlink.pro/movie/${id}?autoplay=false`,
   },
   {
     key: "cine",
@@ -91,6 +92,12 @@ export function Component() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const mediaType = searchParams.get("type") || "movie";
+    const { progressList } = useSelector((state: RootState) => state.watchProgress);
+  const matchedProgress = progressList.find((p) => p.videoId === Number(id));
+
+  // Use URL params if present, otherwise fallback to watchProgress history, otherwise undefined
+  const defaultSeason = searchParams.get("s") || (matchedProgress && matchedProgress.seasonNumber ? String(matchedProgress.seasonNumber) : undefined);
+  const defaultEpisode = searchParams.get("e") || (matchedProgress && matchedProgress.episodeNumber ? String(matchedProgress.episodeNumber) : undefined);
   const [activeServer, setActiveServer] = useState<ServerKey>("vidlink");
 
   const { data: movieDetail } = useGetAppendedVideosQuery(
@@ -101,20 +108,20 @@ export function Component() {
   const servers = useMemo(() => {
     const lang = movieDetail?.original_language;
     if (lang === "ko" || lang === "zh" || lang === "ja" || lang === "th") {
-      return [{
-        key: "dramacool",
-        name: "Dramacool (Native)",
-        badge: "Asian Drama",
-      }] as ServerOption[];
+      return [
+        BASE_SERVERS[0], // VidLink
+        { key: "dramacool", name: "DramaCool", badge: "Legacy" }
+      ];
     }
-    return [...BASE_SERVERS];
+    return BASE_SERVERS;
   }, [movieDetail]);
 
   useEffect(() => {
     if (movieDetail) {
       const lang = movieDetail.original_language;
       if (lang === "ko" || lang === "zh" || lang === "ja" || lang === "th") {
-        setActiveServer("dramacool");
+        // We now keep vidlink as default even for Asian dramas since DramaCool API is down
+        // setActiveServer("vidlink");
       }
     }
   }, [movieDetail]);
@@ -160,6 +167,9 @@ export function Component() {
   // Track time spent on page as a mock for video progress (since we use iframes)
   useEffect(() => {
     if (!id || !movieDetail) return;
+    
+    // Skip if we are rendering TvPlayerUI, because it handles its own progress with accurate seasons/episodes
+    if (mediaType === "tv" && movieDetail?.seasons) return;
     
     let progress = 0;
     const interval = setInterval(() => {
@@ -301,8 +311,12 @@ export function Component() {
         </Box>
       ) : mediaType === "tv" && movieDetail?.seasons ? (
         <TvPlayerUI 
+          key={`${id}-${defaultSeason}-${defaultEpisode}`}
           showId={Number(id)}
           seasons={movieDetail.seasons}
+          movieDetail={movieDetail}
+          defaultSeason={defaultSeason ? Number(defaultSeason) : undefined}
+          defaultEpisode={defaultEpisode ? Number(defaultEpisode) : undefined}
           getServerUrl={(showId, mType, season, episode) => 
             currentServer.getUrl ? currentServer.getUrl(showId, mType, season, episode) : ""
           }
