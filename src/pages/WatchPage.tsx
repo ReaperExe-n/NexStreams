@@ -169,25 +169,10 @@ export function Component() {
   );
 
   const servers = useMemo(() => {
-    const lang = movieDetail?.original_language;
-    if (lang === "ko" || lang === "zh" || lang === "ja" || lang === "th") {
-      return [
-        BASE_SERVERS[0], // VidLink
-        { key: "dramacool", name: "DramaCool", badge: "Legacy" }
-      ];
-    }
     return BASE_SERVERS;
   }, [movieDetail]);
 
-  useEffect(() => {
-    if (movieDetail) {
-      const lang = movieDetail.original_language;
-      if (lang === "ko" || lang === "zh" || lang === "ja" || lang === "th") {
-        // We now keep vidlink as default even for Asian dramas since DramaCool API is down
-        // setActiveServer("vidlink");
-      }
-    }
-  }, [movieDetail]);
+
 
   // Track if this movie has been reported as broken
   const [isReported, setIsReported] = useState<boolean>(() => {

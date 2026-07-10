@@ -15,7 +15,7 @@ import MotionContainer from "src/components/animate/MotionContainer";
 import { varFadeIn } from "src/components/animate/variants/fade/FadeIn";
 import { CustomGenre, Genre } from "src/types/Genre";
 import { Movie } from "src/types/Movie";
-import { PaginatedMovieResult } from "src/types/Common";
+import { PaginatedMovieResult, MEDIA_TYPE } from "src/types/Common";
 
 const RootStyle = styled("div")(() => ({
   position: "relative",
