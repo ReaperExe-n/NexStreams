@@ -23,53 +23,98 @@ interface ServerOption {
 
 const BASE_SERVERS: ServerOption[] = [
   {
+    key: "vidsrc_mov",
+    name: "vidsrc.mov (Recommended)",
+    badge: "Recommended",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://vidsrc.mov/embed/tv/${id}/${season}/${episode}`
+        : `https://vidsrc.mov/embed/movie/${id}`,
+  },
+  {
     key: "vidlink",
-    name: "VidLink (Primary)",
-    badge: "Auto-Resume & Subs",
+    name: "VidLink",
+    badge: "Auto-Resume",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
         ? `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=false`
         : `https://vidlink.pro/movie/${id}?autoplay=false`,
   },
   {
-    key: "cine",
-    name: "Cine.su (Backup 1)",
-    badge: "High-Speed",
+    key: "vidsrc_fyi",
+    name: "VidSrc.fyi",
+    badge: "Backup",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://cine.su/embed/tv/${id}/${season}/${episode}`
-        : `https://cine.su/embed/movie/${id}`,
+        ? `https://vidsrc.fyi/embed/tv/${id}/${season}/${episode}`
+        : `https://vidsrc.fyi/embed/movie/${id}`,
   },
   {
-    key: "vidsrc",
-    name: "VidSrc.me (Backup 2)",
-    badge: "Reliable",
+    key: "vidrock",
+    name: "VidRock",
+    badge: "Backup",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://vidsrc.me/embed/tv/${id}/${season}/${episode}`
-        : `https://vidsrc.me/embed/movie/${id}`,
+        ? `https://vidrock.net/embed/tv/${id}/${season}/${episode}`
+        : `https://vidrock.net/embed/movie/${id}`,
   },
   {
-    key: "vidsrc_pro",
-    name: "VidSrc.pro (Backup 3)",
-    badge: "Fast",
+    key: "vidnest",
+    name: "Vidnest",
+    badge: "Backup",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://vidsrc.pro/embed/tv/${id}/${season}/${episode}`
-        : `https://vidsrc.pro/embed/movie/${id}`,
+        ? `https://vidnest.net/embed/tv/${id}/${season}/${episode}`
+        : `https://vidnest.net/embed/movie/${id}`,
   },
   {
-    key: "superembed",
-    name: "SuperEmbed (Backup 4)",
-    badge: "Multi-Server",
+    key: "vidking",
+    name: "VidKing",
+    badge: "Backup",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
-        : `https://multiembed.mov/?video_id=${id}&tmdb=1`,
+        ? `https://vidking.net/embed/tv/${id}/${season}/${episode}`
+        : `https://vidking.net/embed/movie/${id}`,
+  },
+  {
+    key: "vidfast",
+    name: "VidFast",
+    badge: "Backup",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://vidfast.net/embed/tv/${id}/${season}/${episode}`
+        : `https://vidfast.net/embed/movie/${id}`,
+  },
+  {
+    key: "vidup",
+    name: "VidUp",
+    badge: "Backup",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://vidup.io/embed/tv/${id}/${season}/${episode}`
+        : `https://vidup.io/embed/movie/${id}`,
+  },
+  {
+    key: "videasy",
+    name: "Videasy",
+    badge: "Backup",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://videasy.net/embed/tv/${id}/${season}/${episode}`
+        : `https://videasy.net/embed/movie/${id}`,
+  },
+  {
+    key: "111movies",
+    name: "111Movies",
+    badge: "Backup",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://111movies.com/embed/tv/${id}/${season}/${episode}`
+        : `https://111movies.com/embed/movie/${id}`,
   },
   {
     key: "2embed",
-    name: "2Embed (Backup 5)",
+    name: "2Embed",
     badge: "Stable",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
@@ -77,14 +122,32 @@ const BASE_SERVERS: ServerOption[] = [
         : `https://www.2embed.cc/embed/${id}`,
   },
   {
-    key: "embedsu",
-    name: "Embed.su (Backup 6)",
-    badge: "Fallback",
+    key: "multiembed",
+    name: "MultiEmbed",
+    badge: "Multi-Server",
     getUrl: (id, mediaType, season = 1, episode = 1) =>
       mediaType === "tv"
-        ? `https://embed.su/embed/tv/${id}/${season}/${episode}`
-        : `https://embed.su/embed/movie/${id}`,
+        ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
+        : `https://multiembed.mov/?video_id=${id}&tmdb=1`,
   },
+  {
+    key: "superflix",
+    name: "SuperFlix",
+    badge: "Backup",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://superflix.net/embed/tv/${id}/${season}/${episode}`
+        : `https://superflix.net/embed/movie/${id}`,
+  },
+  {
+    key: "peachify",
+    name: "Peachify",
+    badge: "Backup",
+    getUrl: (id, mediaType, season = 1, episode = 1) =>
+      mediaType === "tv"
+        ? `https://peachify.com/embed/tv/${id}/${season}/${episode}`
+        : `https://peachify.com/embed/movie/${id}`,
+  }
 ];
 
 export function Component() {
