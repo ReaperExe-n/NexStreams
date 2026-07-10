@@ -2,6 +2,10 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Box, IconButton, Button, Stack, Typography } from "@mui/material";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Box, IconButton, Button, Stack, Typography } from "@mui/material";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import DnsIcon from "@mui/icons-material/Dns";
 import FlagIcon from "@mui/icons-material/Flag";
 import { useGetAppendedVideosQuery } from "src/store/slices/discover";
@@ -9,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "src/store";
 import { updateProgress } from "src/store/slices/watchProgressSlice";
 import { MEDIA_TYPE } from "src/types/Common";
+import VpnBanner from "src/components/VpnBanner";
 import DramaPlayer from "src/components/DramaPlayer";
 import TvPlayerUI from "src/components/TvPlayerUI";
 
@@ -317,31 +322,4 @@ export function Component() {
           movieDetail={movieDetail}
           defaultSeason={defaultSeason ? Number(defaultSeason) : undefined}
           defaultEpisode={defaultEpisode ? Number(defaultEpisode) : undefined}
-          getServerUrl={(showId, mType, season, episode) => 
-            currentServer.getUrl ? currentServer.getUrl(showId, mType, season, episode) : ""
-          }
-          actionButtons={actionButtons}
-        />
-      ) : (
-        <Box sx={{ width: "100%", display: "flex", flexDirection: "column", bgcolor: "#0f0f0f", minHeight: "100vh" }}>
-          <Box sx={{ width: "100%", height: { xs: "50vh", sm: "60vh", md: "80vh" }, position: "relative", bgcolor: "black" }}>
-            <iframe
-              src={embedUrl}
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              allowFullScreen
-              allow="autoplay; encrypted-media"
-              style={{ position: "absolute", top: 0, left: 0 }}
-            />
-          </Box>
-          <Box sx={{ px: { xs: 2, md: 6 }, py: 4 }}>
-             {actionButtons}
-          </Box>
-        </Box>
-      )}
-    </Box>
-  );
-}
-
 Component.displayName = "WatchPage";

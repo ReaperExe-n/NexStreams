@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Button, Stack, CircularProgress, IconButton, Drawer, Divider } from "@mui/material";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import CloseIcon from "@mui/icons-material/Close";
+import VpnBanner from "src/components/VpnBanner";
 import axios from "axios";
 
 interface DramaPlayerProps {
@@ -139,6 +140,9 @@ export default function DramaPlayer({ title }: DramaPlayerProps) {
         </Box>
         <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
         <Box sx={{ p: 2, overflowY: "auto", flex: 1 }}>
+          <Box sx={{ mb: 2 }}>
+            <VpnBanner />
+          </Box>
           <Stack spacing={1}>
             {episodes.map((ep) => (
               <Button

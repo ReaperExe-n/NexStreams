@@ -9,6 +9,7 @@ import { useGetConfigurationQuery } from "src/store/slices/configuration";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProgress } from "src/store/slices/watchProgressSlice";
 import { RootState } from "src/store";
+import VpnBanner from "src/components/VpnBanner";
 
 interface TvPlayerUIProps {
   showId: number;
@@ -91,7 +92,8 @@ export default function TvPlayerUI({ showId, seasons, movieDetail, defaultSeason
 
       {/* Action Buttons passed from WatchPage */}
       {actionButtons && (
-        <Box sx={{ px: { xs: 2, md: 6 }, pt: 2 }}>
+        <Box sx={{ px: { xs: 2, md: 6 }, pt: 4 }}>
+          <VpnBanner />
           {actionButtons}
         </Box>
       )}
