@@ -48,12 +48,15 @@ export function Component() {
            <SliderRowForGenre genre={TV_COMMON_TITLES[0]} mediaType={MEDIA_TYPE.Tv} />
            <SliderRowForGenre genre={MOVIE_COMMON_TITLES[1]} mediaType={MEDIA_TYPE.Movie} />
            <SliderRowForGenre genre={TV_COMMON_TITLES[1]} mediaType={MEDIA_TYPE.Tv} />
-           {movieGenres.slice(0, 5).map((g, i) => (
-             <React.Fragment key={g.id}>
-               <SliderRowForGenre genre={g} mediaType={MEDIA_TYPE.Movie} />
-               {tvGenres[i] && <SliderRowForGenre genre={tvGenres[i]} mediaType={MEDIA_TYPE.Tv} />}
-             </React.Fragment>
-           ))}
+           {movieGenres.slice(0, 10).map((g, i) => {
+             // To avoid showing "Animation Movies" right next to "Animation TV Shows", 
+             // we will interleave them. Evens = Movie, Odds = TV.
+             if (i % 2 === 0) {
+               return <SliderRowForGenre key={g.id} genre={g} mediaType={MEDIA_TYPE.Movie} />;
+             } else {
+               return tvGenres[i] ? <SliderRowForGenre key={tvGenres[i].id} genre={tvGenres[i]} mediaType={MEDIA_TYPE.Tv} /> : null;
+             }
+           })}
          </Stack>
        )
     }

@@ -185,7 +185,7 @@ export default function SlickSlider({ data, genre, mediaType }: SlickSliderProps
                   setShowExplore(false);
                 }}
               >
-                {`${genre.name} Movies `}
+                {`${genre.name} ${mediaType === MEDIA_TYPE.Tv ? "TV Shows" : "Movies"} `}
                 <MotionContainer
                   open={showExplore}
                   initial="initial"
