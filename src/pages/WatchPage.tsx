@@ -161,7 +161,7 @@ export function Component() {
   // Use URL params if present, otherwise fallback to watchProgress history, otherwise undefined
   const defaultSeason = searchParams.get("s") || (matchedProgress && matchedProgress.seasonNumber ? String(matchedProgress.seasonNumber) : undefined);
   const defaultEpisode = searchParams.get("e") || (matchedProgress && matchedProgress.episodeNumber ? String(matchedProgress.episodeNumber) : undefined);
-  const [activeServer, setActiveServer] = useState<ServerKey>("vidlink");
+  const [activeServer, setActiveServer] = useState<ServerKey>("vidsrc_mov");
 
   const { data: movieDetail } = useGetAppendedVideosQuery(
     { mediaType: mediaType as MEDIA_TYPE, id: Number(id) },
