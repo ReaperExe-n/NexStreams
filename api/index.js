@@ -100,3 +100,11 @@ app.get('/api/movies/dramacool/watch', async (req, res) => {
 
 // Export the Express app as a Vercel serverless function
 module.exports = app;
+
+// Add local server listener for local development
+if (require.main === module) {
+    const port = process.env.PORT || 3001;
+    app.listen(port, () => {
+        console.log(`Backend server listening on port ${port}`);
+    });
+}

@@ -11,6 +11,8 @@ import { updateProgress } from "src/store/slices/watchProgressSlice";
 import { MEDIA_TYPE } from "src/types/Common";
 import DramaPlayer from "src/components/DramaPlayer";
 import TvPlayerUI from "src/components/TvPlayerUI";
+import VpnBanner from "src/components/VpnBanner";
+import { MAIN_PATH } from "src/constant";
 
 type ServerKey = string;
 
@@ -246,13 +248,15 @@ export function Component() {
   const title = movieDetail?.title || movieDetail?.name || "";
 
   const actionButtons = (
-    <Stack direction="row" spacing={2} sx={{ width: "100%", flexWrap: "wrap", gap: 2 }}>
-      {servers.length > 1 && (
-        <Button
-          variant="contained"
-          color="error"
-          startIcon={<DnsIcon />}
-          onClick={handleFixLag}
+    <Box sx={{ width: "100%", mt: 2 }}>
+      <VpnBanner affiliateLink="https://go.nordvpn.net/aff_c?offer_id=15&aff_id=dummy" />
+      <Stack direction="row" spacing={2} sx={{ width: "100%", flexWrap: "wrap", gap: 2 }}>
+        {servers.length > 1 && (
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<DnsIcon />}
+            onClick={handleFixLag}
           sx={{
             borderRadius: "30px",
             textTransform: "none",
@@ -302,7 +306,8 @@ export function Component() {
       >
         {isReported ? "Reported Broken" : "Report Video"}
       </Button>
-    </Stack>
+      </Stack>
+    </Box>
   );
 
   return (
